@@ -33,7 +33,7 @@
       }
 
       footer {
-        margin: 48px 0 64px 0;
+        margin: 48px 0 96px 0;
         text-align: center;
       }
 
@@ -60,6 +60,12 @@
         object-fit: cover;
         border-radius: 8px;
         box-shadow: 0 4px 18px rgb(0 0 0 / 10%);
+      }
+
+      .img_raw {
+        margin-top: 48px;
+        display: inline;
+        width: 160px;
       }
 
       figcaption {
@@ -107,7 +113,7 @@
     <main>
       <h1>Project 0: Becoming Friends with Your Camera</h1>
 
-      <section aria-labelledby="selfies-heading">
+      <section>
         <h2 id="selfies-heading">Selfies</h2>
         <p>Observation: 1.5x zoom looks better, more proportional, and less frontal at the center of the image.</p>
         <div class="gallery">
@@ -122,7 +128,7 @@
         </div>
       </section>
 
-      <section aria-labelledby="buildings-heading">
+      <section>
         <h2 id="buildings-heading">Buildings</h2>
         <p>Observation: geometries at a distance of 200m are more flattened.</p>
         <div class="gallery">
@@ -137,7 +143,7 @@
         </div>
       </section>
 
-      <section aria-labelledby="dolly-heading">
+      <section>
         <h2 id="dolly-heading">Dolly Zoom</h2>
         <p>Observation: the spatial background changes and the object becomes more flattened (less wide) while zooming in.</p>
         <div class="gallery">
@@ -146,17 +152,24 @@
             <figcaption>Animated dolly zoom</figcaption>
           </figure>
           <figure>
-            <div class="carousel" aria-label="Dolly zoom photo carousel">
+            <div class="carousel">
               <img class="slide active" src="images/IMG_5634%20Large.jpeg" alt="Dolly zoom frame 1" />
               <img class="slide" src="images/IMG_5635%20Large.jpeg" alt="Dolly zoom frame 2" />
               <img class="slide" src="images/IMG_5636%20Large.jpeg" alt="Dolly zoom frame 3" />
               <img class="slide" src="images/IMG_5637%20Large.jpeg" alt="Dolly zoom frame 4" />
               <img class="slide" src="images/IMG_5638%20Large.jpeg" alt="Dolly zoom frame 5" />
-              <button class="previous" type="button" aria-label="Previous image">&#8249;</button>
-              <button class="next" type="button" aria-label="Next image">&#8250;</button>
+              <button class="previous" type="button">&#8249;</button>
+              <button class="next" type="button">&#8250;</button>
             </div>
             <figcaption>0.5x, 1x, 2x, 4x, and 8x zoom</figcaption>
           </figure>
+        </div>
+        <div>
+            <img class="img_raw" src="images/IMG_5634%20Large.jpeg" alt="Dolly zoom frame 1" />
+            <img class="img_raw" src="images/IMG_5635%20Large.jpeg" alt="Dolly zoom frame 2" />
+            <img class="img_raw" src="images/IMG_5636%20Large.jpeg" alt="Dolly zoom frame 3" />
+            <img class="img_raw" src="images/IMG_5637%20Large.jpeg" alt="Dolly zoom frame 4" />
+            <img class="img_raw" src="images/IMG_5638%20Large.jpeg" alt="Dolly zoom frame 5" />
         </div>
       </section>
     </main>
