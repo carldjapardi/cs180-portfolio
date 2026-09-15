@@ -1,0 +1,755 @@
+{
+  "provided": [
+    {
+      "id": "tobolsk",
+      "original": {
+        "image": "assets/tobolsk-original.jpg",
+        "width": 396,
+        "height": 1024
+      },
+      "title": "Tobolsk",
+      "type": "jpg",
+      "input_width": 396,
+      "channel_height": 341,
+      "single": {
+        "image": "assets/tobolsk-single.jpg",
+        "width": 396,
+        "height": 341,
+        "red": [
+          3,
+          6
+        ],
+        "green": [
+          3,
+          3
+        ],
+        "red_score": 0.8574,
+        "green_score": 0.9207,
+        "seconds": 0.02
+      },
+      "pyramid": {
+        "image": "assets/tobolsk-pyramid.jpg",
+        "width": 396,
+        "height": 341,
+        "red": [
+          3,
+          6
+        ],
+        "green": [
+          3,
+          3
+        ],
+        "red_score": 0.8574,
+        "green_score": 0.9207,
+        "seconds": 0.03
+      },
+      "edge": {
+        "image": "assets/tobolsk-edge.jpg",
+        "width": 396,
+        "height": 341,
+        "red": [
+          3,
+          6
+        ],
+        "green": [
+          2,
+          3
+        ],
+        "red_score": 0.779,
+        "green_score": 0.8226,
+        "seconds": 0.06
+      }
+    },
+    {
+      "id": "cathedral",
+      "original": {
+        "image": "assets/cathedral-original.jpg",
+        "width": 390,
+        "height": 1024
+      },
+      "title": "Cathedral",
+      "type": "jpg",
+      "input_width": 390,
+      "channel_height": 341,
+      "single": {
+        "image": "assets/cathedral-single.jpg",
+        "width": 390,
+        "height": 341,
+        "red": [
+          3,
+          12
+        ],
+        "green": [
+          2,
+          5
+        ],
+        "red_score": 0.9056,
+        "green_score": 0.9602,
+        "seconds": 0.01
+      },
+      "pyramid": {
+        "image": "assets/cathedral-pyramid.jpg",
+        "width": 390,
+        "height": 341,
+        "red": [
+          3,
+          12
+        ],
+        "green": [
+          2,
+          5
+        ],
+        "red_score": 0.9056,
+        "green_score": 0.9602,
+        "seconds": 0.03
+      },
+      "edge": {
+        "image": "assets/cathedral-edge.jpg",
+        "width": 390,
+        "height": 341,
+        "red": [
+          3,
+          12
+        ],
+        "green": [
+          2,
+          5
+        ],
+        "red_score": 0.6291,
+        "green_score": 0.7371,
+        "seconds": 0.06
+      }
+    },
+    {
+      "id": "monastery",
+      "original": {
+        "image": "assets/monastery-original.jpg",
+        "width": 391,
+        "height": 1024
+      },
+      "title": "Monastery",
+      "type": "jpg",
+      "input_width": 391,
+      "channel_height": 341,
+      "single": {
+        "image": "assets/monastery-single.jpg",
+        "width": 391,
+        "height": 341,
+        "red": [
+          2,
+          3
+        ],
+        "green": [
+          2,
+          -3
+        ],
+        "red_score": 0.7941,
+        "green_score": 0.9396,
+        "seconds": 0.02
+      },
+      "pyramid": {
+        "image": "assets/monastery-pyramid.jpg",
+        "width": 391,
+        "height": 341,
+        "red": [
+          2,
+          3
+        ],
+        "green": [
+          2,
+          -3
+        ],
+        "red_score": 0.7941,
+        "green_score": 0.9396,
+        "seconds": 0.03
+      },
+      "edge": {
+        "image": "assets/monastery-edge.jpg",
+        "width": 391,
+        "height": 341,
+        "red": [
+          2,
+          3
+        ],
+        "green": [
+          2,
+          -3
+        ],
+        "red_score": 0.8062,
+        "green_score": 0.8819,
+        "seconds": 0.06
+      }
+    },
+    {
+      "id": "emir",
+      "original": {
+        "image": "assets/emir-original.jpg",
+        "width": 615,
+        "height": 1600
+      },
+      "title": "Emir of Bukhara",
+      "type": "tif",
+      "input_width": 3702,
+      "channel_height": 3209,
+      "pyramid": {
+        "image": "assets/emir-pyramid.jpg",
+        "width": 1600,
+        "height": 1387,
+        "red": [
+          -205,
+          99
+        ],
+        "green": [
+          23,
+          45
+        ],
+        "red_score": 0.2784,
+        "green_score": 0.6933,
+        "seconds": 3.12
+      },
+      "edge": {
+        "image": "assets/emir-edge.jpg",
+        "width": 1600,
+        "height": 1387,
+        "red": [
+          40,
+          100
+        ],
+        "green": [
+          24,
+          46
+        ],
+        "red_score": 0.3438,
+        "green_score": 0.389,
+        "seconds": 5.39
+      }
+    },
+    {
+      "id": "self_portrait",
+      "original": {
+        "image": "assets/self_portrait-original.jpg",
+        "width": 625,
+        "height": 1600
+      },
+      "title": "Self-portrait",
+      "type": "tif",
+      "input_width": 3810,
+      "channel_height": 3251,
+      "pyramid": {
+        "image": "assets/self_portrait-pyramid.jpg",
+        "width": 1600,
+        "height": 1365,
+        "red": [
+          36,
+          175
+        ],
+        "green": [
+          29,
+          78
+        ],
+        "red_score": 0.7452,
+        "green_score": 0.7864,
+        "seconds": 3.33
+      },
+      "edge": {
+        "image": "assets/self_portrait-edge.jpg",
+        "width": 1600,
+        "height": 1365,
+        "red": [
+          37,
+          175
+        ],
+        "green": [
+          29,
+          78
+        ],
+        "red_score": 0.3918,
+        "green_score": 0.4096,
+        "seconds": 5.75
+      }
+    },
+    {
+      "id": "melons",
+      "original": {
+        "image": "assets/melons-original.jpg",
+        "width": 620,
+        "height": 1600
+      },
+      "title": "Melons",
+      "type": "tif",
+      "input_width": 3770,
+      "channel_height": 3241,
+      "pyramid": {
+        "image": "assets/melons-pyramid.jpg",
+        "width": 1600,
+        "height": 1375,
+        "red": [
+          13,
+          178
+        ],
+        "green": [
+          10,
+          81
+        ],
+        "red_score": 0.9131,
+        "green_score": 0.9388,
+        "seconds": 3.28
+      },
+      "edge": {
+        "image": "assets/melons-edge.jpg",
+        "width": 1600,
+        "height": 1375,
+        "red": [
+          13,
+          178
+        ],
+        "green": [
+          6,
+          77
+        ],
+        "red_score": 0.3375,
+        "green_score": 0.377,
+        "seconds": 5.62
+      }
+    },
+    {
+      "id": "church",
+      "original": {
+        "image": "assets/church-original.jpg",
+        "width": 605,
+        "height": 1600
+      },
+      "title": "Church",
+      "type": "tif",
+      "input_width": 3634,
+      "channel_height": 3202,
+      "pyramid": {
+        "image": "assets/church-pyramid.jpg",
+        "width": 1600,
+        "height": 1410,
+        "red": [
+          -4,
+          58
+        ],
+        "green": [
+          4,
+          25
+        ],
+        "red_score": 0.7471,
+        "green_score": 0.9075,
+        "seconds": 3.2
+      },
+      "edge": {
+        "image": "assets/church-edge.jpg",
+        "width": 1600,
+        "height": 1410,
+        "red": [
+          -4,
+          58
+        ],
+        "green": [
+          4,
+          25
+        ],
+        "red_score": 0.5062,
+        "green_score": 0.5258,
+        "seconds": 5.25
+      }
+    },
+    {
+      "id": "harvesters",
+      "original": {
+        "image": "assets/harvesters-original.jpg",
+        "width": 610,
+        "height": 1600
+      },
+      "title": "Harvesters",
+      "type": "tif",
+      "input_width": 3683,
+      "channel_height": 3218,
+      "pyramid": {
+        "image": "assets/harvesters-pyramid.jpg",
+        "width": 1600,
+        "height": 1398,
+        "red": [
+          13,
+          124
+        ],
+        "green": [
+          16,
+          58
+        ],
+        "red_score": 0.7977,
+        "green_score": 0.7856,
+        "seconds": 3.27
+      },
+      "edge": {
+        "image": "assets/harvesters-edge.jpg",
+        "width": 1600,
+        "height": 1398,
+        "red": [
+          13,
+          123
+        ],
+        "green": [
+          17,
+          60
+        ],
+        "red_score": 0.2972,
+        "green_score": 0.3416,
+        "seconds": 5.49
+      }
+    },
+    {
+      "id": "icon",
+      "original": {
+        "image": "assets/icon-original.jpg",
+        "width": 615,
+        "height": 1600
+      },
+      "title": "Icon",
+      "type": "tif",
+      "input_width": 3741,
+      "channel_height": 3244,
+      "pyramid": {
+        "image": "assets/icon-pyramid.jpg",
+        "width": 1600,
+        "height": 1387,
+        "red": [
+          23,
+          91
+        ],
+        "green": [
+          17,
+          43
+        ],
+        "red_score": 0.644,
+        "green_score": 0.7955,
+        "seconds": 3.38
+      },
+      "edge": {
+        "image": "assets/icon-edge.jpg",
+        "width": 1600,
+        "height": 1387,
+        "red": [
+          23,
+          92
+        ],
+        "green": [
+          17,
+          44
+        ],
+        "red_score": 0.3203,
+        "green_score": 0.3597,
+        "seconds": 5.52
+      }
+    },
+    {
+      "id": "ilemselga",
+      "original": {
+        "image": "assets/ilemselga-original.jpg",
+        "width": 620,
+        "height": 1600
+      },
+      "title": "Ilemselga",
+      "type": "tif",
+      "input_width": 3800,
+      "channel_height": 3270,
+      "pyramid": {
+        "image": "assets/ilemselga-pyramid.jpg",
+        "width": 1600,
+        "height": 1377,
+        "red": [
+          11,
+          130
+        ],
+        "green": [
+          7,
+          40
+        ],
+        "red_score": 0.5848,
+        "green_score": 0.7432,
+        "seconds": 3.42
+      },
+      "edge": {
+        "image": "assets/ilemselga-edge.jpg",
+        "width": 1600,
+        "height": 1377,
+        "red": [
+          11,
+          131
+        ],
+        "green": [
+          7,
+          40
+        ],
+        "red_score": 0.5263,
+        "green_score": 0.6328,
+        "seconds": 5.81
+      }
+    },
+    {
+      "id": "religous_painting",
+      "original": {
+        "image": "assets/religous_painting-original.jpg",
+        "width": 625,
+        "height": 1600
+      },
+      "title": "Religious painting",
+      "type": "tif",
+      "input_width": 3742,
+      "channel_height": 3193,
+      "pyramid": {
+        "image": "assets/religous_painting-pyramid.jpg",
+        "width": 1600,
+        "height": 1365,
+        "red": [
+          7,
+          67
+        ],
+        "green": [
+          3,
+          27
+        ],
+        "red_score": 0.7788,
+        "green_score": 0.8331,
+        "seconds": 3.28
+      },
+      "edge": {
+        "image": "assets/religous_painting-edge.jpg",
+        "width": 1600,
+        "height": 1365,
+        "red": [
+          6,
+          64
+        ],
+        "green": [
+          5,
+          30
+        ],
+        "red_score": 0.4087,
+        "green_score": 0.4288,
+        "seconds": 5.48
+      }
+    },
+    {
+      "id": "siren",
+      "original": {
+        "image": "assets/siren-original.jpg",
+        "width": 626,
+        "height": 1600
+      },
+      "title": "Siren",
+      "type": "tif",
+      "input_width": 3817,
+      "channel_height": 3250,
+      "pyramid": {
+        "image": "assets/siren-pyramid.jpg",
+        "width": 1600,
+        "height": 1362,
+        "red": [
+          -25,
+          98
+        ],
+        "green": [
+          -6,
+          50
+        ],
+        "red_score": 0.8835,
+        "green_score": 0.8445,
+        "seconds": 3.45
+      },
+      "edge": {
+        "image": "assets/siren-edge.jpg",
+        "width": 1600,
+        "height": 1362,
+        "red": [
+          -24,
+          103
+        ],
+        "green": [
+          -6,
+          50
+        ],
+        "red_score": 0.2481,
+        "green_score": 0.394,
+        "seconds": 5.85
+      }
+    },
+    {
+      "id": "three_generations",
+      "original": {
+        "image": "assets/three_generations-original.jpg",
+        "width": 617,
+        "height": 1600
+      },
+      "title": "Three generations",
+      "type": "tif",
+      "input_width": 3714,
+      "channel_height": 3209,
+      "pyramid": {
+        "image": "assets/three_generations-pyramid.jpg",
+        "width": 1600,
+        "height": 1382,
+        "red": [
+          11,
+          111
+        ],
+        "green": [
+          14,
+          52
+        ],
+        "red_score": 0.8964,
+        "green_score": 0.9298,
+        "seconds": 3.26
+      },
+      "edge": {
+        "image": "assets/three_generations-edge.jpg",
+        "width": 1600,
+        "height": 1382,
+        "red": [
+          10,
+          114
+        ],
+        "green": [
+          12,
+          54
+        ],
+        "red_score": 0.4272,
+        "green_score": 0.4428,
+        "seconds": 5.5
+      }
+    },
+    {
+      "id": "wharf",
+      "original": {
+        "image": "assets/wharf-original.jpg",
+        "width": 618,
+        "height": 1600
+      },
+      "title": "Wharf",
+      "type": "tif",
+      "input_width": 3761,
+      "channel_height": 3244,
+      "pyramid": {
+        "image": "assets/wharf-pyramid.jpg",
+        "width": 1600,
+        "height": 1380,
+        "red": [
+          -16,
+          84
+        ],
+        "green": [
+          -7,
+          16
+        ],
+        "red_score": 0.7652,
+        "green_score": 0.8937,
+        "seconds": 3.37
+      },
+      "edge": {
+        "image": "assets/wharf-edge.jpg",
+        "width": 1600,
+        "height": 1380,
+        "red": [
+          -16,
+          83
+        ],
+        "green": [
+          -7,
+          15
+        ],
+        "red_score": 0.5034,
+        "green_score": 0.6597,
+        "seconds": 5.63
+      }
+    }
+  ],
+  "selected": [
+    {
+      "id": "ex1",
+      "original": {
+        "image": "assets/ex1-original.jpg",
+        "width": 399,
+        "height": 1024
+      },
+      "title": "Example 1 · Textile machinery",
+      "type": "jpg",
+      "input_width": 399,
+      "channel_height": 341,
+      "pyramid": {
+        "image": "assets/ex1-pyramid.jpg",
+        "width": 399,
+        "height": 341,
+        "red": [
+          4,
+          14
+        ],
+        "green": [
+          3,
+          7
+        ],
+        "red_score": 0.8705,
+        "green_score": 0.9205,
+        "seconds": 0.04
+      }
+    },
+    {
+      "id": "ex2",
+      "original": {
+        "image": "assets/ex2-original.jpg",
+        "width": 398,
+        "height": 1024
+      },
+      "title": "Example 2 · Sculpture",
+      "type": "jpg",
+      "input_width": 398,
+      "channel_height": 341,
+      "pyramid": {
+        "image": "assets/ex2-pyramid.jpg",
+        "width": 398,
+        "height": 341,
+        "red": [
+          2,
+          8
+        ],
+        "green": [
+          1,
+          1
+        ],
+        "red_score": 0.9443,
+        "green_score": 0.9878,
+        "seconds": 0.04
+      }
+    },
+    {
+      "id": "ex3",
+      "original": {
+        "image": "assets/ex3-original.jpg",
+        "width": 401,
+        "height": 1024
+      },
+      "title": "Example 3 · Uniformed portrait",
+      "type": "jpg",
+      "input_width": 401,
+      "channel_height": 341,
+      "pyramid": {
+        "image": "assets/ex3-pyramid.jpg",
+        "width": 401,
+        "height": 341,
+        "red": [
+          -1,
+          9
+        ],
+        "green": [
+          1,
+          4
+        ],
+        "red_score": 0.8488,
+        "green_score": 0.8088,
+        "seconds": 0.04
+      }
+    }
+  ],
+  "method": "Current colorize_skel.py functions; default OpenCV grayscale loading; RGB images resized only after full-resolution alignment."
+}
