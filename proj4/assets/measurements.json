@@ -1,0 +1,73 @@
+{
+  "description": "Homographies and mean forward reprojection error computed from parta.py correspondences. Rectification timings: median of 5 local runs after one warmup per method, using the original input photos and saved output dimensions. Timings are environment dependent.",
+  "results": {
+    "edge": {
+      "H": [
+        [
+          1.3245541643265812,
+          -0.2652829383368628,
+          -277.50733694075336
+        ],
+        [
+          0.48935276476944095,
+          1.127250962067482,
+          -242.4620246691916
+        ],
+        [
+          0.000431389302842017,
+          -9.207370730614131e-05,
+          1.0
+        ]
+      ],
+      "mean_error": 1.1049721192235642,
+      "timings": {
+        "warpImageNearestNeighbor": 1.6759999562054873,
+        "warpImageBilinear": 4.020959138870239
+      }
+    },
+    "zeller": {
+      "H": [
+        [
+          1.3403133703671377,
+          -0.28266175740843547,
+          -273.176107131057
+        ],
+        [
+          0.5408356861441171,
+          1.021921620867704,
+          -200.5091175716766
+        ],
+        [
+          0.0005083146146600341,
+          -0.0001561283951231159,
+          1.0
+        ]
+      ],
+      "mean_error": 1.2795581551310704,
+      "timings": {
+        "warpImageNearestNeighbor": 0.7974167820066214,
+        "warpImageBilinear": 1.9533340819180012
+      }
+    },
+    "laptop": {
+      "H": [
+        [
+          1.5551871187146866,
+          0.24637431139990035,
+          -925.1852053746618
+        ],
+        [
+          0.10847249906068586,
+          1.375116859331174,
+          -62.089793077354166
+        ],
+        [
+          0.0005381513938513664,
+          3.2582189849232025e-05,
+          1.0
+        ]
+      ],
+      "mean_error": 4.247089488524555
+    }
+  }
+}

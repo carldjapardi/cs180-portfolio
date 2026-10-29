@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="CS180 Project 4 Part A by Carl Djapardi: recovering homographies, inverse image warping, rectification, and manually stitched photo mosaics." />
+  <title>CS 180 Proj 4 · Image Warping and Mosaicing</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><nav class="nav" aria-label="Project navigation">
+  <a class="nav-brand" href="../index.html">← CS180 Portfolio</a>
+  <div class="nav-links"><a href="#pictures">Pictures</a><a href="#homographies">Homographies</a><a href="#warping">Warping</a><a href="#mosaics">Mosaics</a></div>
+</nav></header>
+<main id="main">
+<div class="intro"><div>
+  <p class="eyebrow">CS180 · Project 04 · Fall 2026 · Carl Djapardi</p>
+  <h1>Image Warping<br />and Mosaicing</h1>
+  <p class="hero-description">The goal of this project is to combine different views of the same scene into one image. I start by selecting matching points and recovering a homography, then use that transformation to straighten objects and blend overlapping photos into mosaics.</p>
+</div>
+<figure class=""><a class="photo-link" href="assets/mosaic-edge.jpeg"><img src="assets/mosaic-edge.jpeg" alt="Two views, one wider scene." width="1660" height="1604" loading="eager" decoding="async" /></a><figcaption>Two views, one wider scene.</figcaption></figure>
+</div>
+<p class="part-heading">Part A / Image warping and mosaicing</p>
+<section id="pictures"><div class="section-heading"><span class="section-number">A.1 /</span><h2>Shoot the pictures</h2></div>
+
+<p class="prose">Here are the three image pairs I use: 1. the building called edge across from a balcony, 2. Zellerbach hall, and 3. laptop on a table. Each pair has an overlapping region (about 50%) with recognizable corners and edges, which makes it possible to select the same points in both images.</p>
+<p class="prose">The idea is to rotate the camera around a fixed center of projection. Under pure rotation, a homography relates the two views. If the camera also translates, a single homography can still align a plane, but objects at other depths (focal lengths) may not line up.</p>
+<h3 id="sources-edge">Edge Building</h3><div class="gallery two source-pair">
+<figure class=""><a class="photo-link" href="assets/edgeLeft.jpeg"><img src="assets/edgeLeft.jpeg" alt="Edge Building · left view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Edge Building · left view</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/edgeRight.jpeg"><img src="assets/edgeRight.jpeg" alt="Edge Building · right view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Edge Building · right view</figcaption></figure>
+</div>
+<h3 id="sources-zeller">Zellerbach</h3><div class="gallery two source-pair">
+<figure class=""><a class="photo-link" href="assets/zellerLeft.jpeg"><img src="assets/zellerLeft.jpeg" alt="Zellerbach · left view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · left view</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/zellerRight.jpeg"><img src="assets/zellerRight.jpeg" alt="Zellerbach · right view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · right view</figcaption></figure>
+</div>
+<h3 id="sources-laptop">Laptop</h3><div class="gallery two source-pair">
+<figure class=""><a class="photo-link" href="assets/laptopLeft.jpeg"><img src="assets/laptopLeft.jpeg" alt="Laptop · left view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Laptop · left view</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/laptopRight.jpeg"><img src="assets/laptopRight.jpeg" alt="Laptop · right view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Laptop · right view</figcaption></figure>
+</div>
+</section>
+<section id="homographies"><div class="section-heading"><span class="section-number">A.2 /</span><h2>Recover homographies</h2></div>
+
+<p class="prose">A homography is a 3 × 3 matrix that maps points from one image to another in homogeneous coordinates (8 DOF). It can account for perspective changes, so parallel lines do not have to stay parallel. What remains the same after transformation is straight lines (colinear lines). Since multiplying the whole matrix by a nonzero scalar gives the same mapping, I set its bottom-right entry to 1 and solve for the remaining eight values.</p>
+<div class="equation">[u, v, w]<sup>T</sup> = H[x, y, 1]<sup>T</sup> &nbsp; · &nbsp; x′ = u / w &nbsp; · &nbsp; y′ = v / w</div>
+<p class="prose">For each match (x, y) → (x′, y′), multiplying through by the denominator gives two linear equations. Stacking these rows for all correspondences forms Ah = b, where h contains the first eight entries of H in row order.</p>
+<pre aria-label="Two rows of the homography linear system"><code>[ x  y  1  0  0  0  −xx′  −yx′ ] h = x′
+[ 0  0  0  x  y  1  −xy′  −yy′ ] h = y′</code></pre>
+<p class="prose">Four point pairs give eight equations, but a small error in a selected point can change the result significantly. I use seven matches for the building, six for Zellerbach, and seven for the laptop. This gives overdetermined systems with 14, 12, and 14 equations respectively, which I solve with <code>np.linalg.lstsq</code>.</p>
+<h3>Manually selected correspondences</h3><p class="prose">Matching labels below indicate the same physical point in the two views. I use building corners and window edges outdoors, and points on the laptop screen and keyboard indoors.</p>
+<figure class="correspondences"><a class="photo-link" href="assets/correspondences-edge.png"><img src="assets/correspondences-edge.png" alt="Building · 7 correspondences" width="2142" height="1460" loading="lazy" decoding="async" /></a><figcaption>Edge Building · 7 correspondences</figcaption></figure>
+<figure class="correspondences"><a class="photo-link" href="assets/correspondences-zeller.png"><img src="assets/correspondences-zeller.png" alt="Zellerbach · 6 correspondences" width="2142" height="1440" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · 6 correspondences</figcaption></figure>
+<figure class="correspondences"><a class="photo-link" href="assets/correspondences-laptop.png"><img src="assets/correspondences-laptop.png" alt="Laptop · 7 correspondences" width="2142" height="1460" loading="lazy" decoding="async" /></a><figcaption>Laptop · 7 correspondences</figcaption></figure>
+<h3>Recovered matrices · left → right</h3><p class="prose">Each matrix (H) maps the left image into the right image’s coordinate system.</p><div class="gallery three matrices">
+<div><p class="matrix-label">Building</p><pre class="matrix"><code>[  1.32455  -0.265283  -277.507 ]
+[  0.489353   1.12725  -242.462 ]
+[  0.000431389  -9.20737e-05   1 ]</code></pre></div>
+<div><p class="matrix-label">Zellerbach</p><pre class="matrix"><code>[  1.34031  -0.282662  -273.176 ]
+[  0.540836   1.02192  -200.509 ]
+[  0.000508315  -0.000156128   1 ]</code></pre></div>
+<div><p class="matrix-label">Laptop</p><pre class="matrix"><code>[  1.55519   0.246374  -925.185 ]
+[  0.108472   1.37512  -62.0898 ]
+[  0.000538151   3.25822e-05   1 ]</code></pre></div>
+</section>
+<section id="warping"><div class="section-heading"><span class="section-number">A.3 /</span><h2>Warp the images</h2></div>
+
+<p class="prose">Forward warping sends each source pixel into the output, but rounding can leave holes where no pixel lands. Thus, inverse warping is used instead: visit each output pixel, map it back through H<sup>−1</sup>, divide by its homogeneous coordinate, and sample the source at that location.</p>
+<p class="prose">I transform all four source corners and take the floor of the minimum coordinates and the ceiling of the maximum coordinates. A translation moves that bounding box to the output origin. The inverse mapping is then (T @ H)<sup>−1</sup>, where T is that translation matrix. Pixels whose source coordinates fall outside the input remain black.</p>
+<div class="equation">[u, v, w]<sup>T</sup> = (T @ H)<sup>−1</sup>[x<sub>out</sub>, y<sub>out</sub>, 1]<sup>T</sup> &nbsp; · &nbsp; (x<sub>src</sub>, y<sub>src</sub>) = (u/w, v/w)</div>
+<h3>Nearest neighbor vs. bilinear interpolation</h3>
+<p class="prose">The inverse-mapped location usually falls between pixels. My nearest-neighbor implementation rounds it to the closest pixel and copies that value. My bilinear implementation uses the four surrounding pixels, weighted by the fractional horizontal and vertical distances.</p>
+<div class="equation">Im(x, y) = (1−a)(1−b)Im<sub>00</sub> + a(1−b)Im<sub>10</sub> + (1−a)bIm<sub>01</sub> + abIm<sub>11</sub></div>
+<p class="prose">Here a = x − floor(x) and b = y − floor(y). Nearest neighbor has less operations but can create jagged edges and aliasing. Bilinear needs four samples and more arithmetic, but produces smoother transitions. It can also soften fine details.</p>
+<h3>Rectification / Edge Building balcony railing</h3>
+<p class="prose">For rectification, I match four corners of a surface in the original photo to a rectangle that I define by hand. For the railing, the source points are (41, 524), (148, 601), (6, 631), and (124, 700) in the left building photo. I map them to (0, 0), (100, 0), (0, 100), and (100, 100), then sample a 100 × 100 output.</p>
+<div class="gallery rectification">
+<figure class=""><a class="photo-link" href="assets/edge_rect_og.jpeg"><img src="assets/edge_rect_og.jpeg" alt="Original crop · balcony railing" width="324" height="464" loading="lazy" decoding="async" /></a><figcaption>Original crop · balcony railing</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/edge_rec_nn.jpeg"><img src="assets/edge_rec_nn.jpeg" alt="Rectified · nearest neighbor" width="100" height="100" loading="lazy" decoding="async" /></a><figcaption>Rectified · nearest neighbor</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/edge_rec_bil.jpeg"><img src="assets/edge_rec_bil.jpeg" alt="Rectified · bilinear" width="100" height="100" loading="lazy" decoding="async" /></a><figcaption>Rectified · bilinear</figcaption></figure>
+
+</div><p class="prose">The slanted railing becomes upright in both results. The repeated thin bars make the interpolation difference easy to see: nearest neighbor creates rough, uneven edges, while bilinear smooths them.</p>
+<h3>Rectification / Zellerbach Cal Performances sign</h3>
+<p class="prose">For the sign, I use points (249, 1174), (459, 1156), (245, 1209), and (460, 1187) in the right Zellerbach photo. The destination points are (0, 0), (200, 0), (0, 35), and (200, 35), with an output shape of 35 × 200.</p>
+<div class="gallery rectification">
+<figure class=""><a class="photo-link" href="assets/zeller_rect_og.jpeg"><img src="assets/zeller_rect_og.jpeg" alt="Original crop · Cal Performances sign" width="1016" height="284" loading="lazy" decoding="async" /></a><figcaption>Original crop · Cal Performances sign</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/zeller_rec_nn.jpeg"><img src="assets/zeller_rec_nn.jpeg" alt="Rectified · nearest neighbor" width="200" height="36" loading="lazy" decoding="async" /></a><figcaption>Rectified · nearest neighbor</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/zeller_rec_bil.jpeg"><img src="assets/zeller_rec_bil.jpeg" alt="Rectified · bilinear" width="200" height="36" loading="lazy" decoding="async" /></a><figcaption>Rectified · bilinear</figcaption></figure>
+
+</div><p class="prose">The sign’s horizontal edges straighten and the text is easier to read across the strip. Bilinear reduces the jagged letter edges, although both results remain blurry because the sign occupies a small region in the source image.</p>
+<div class="table-wrap"><table><caption>Rectification runtime in milliseconds · median of 5 local runs</caption><thead><tr><th scope="col">Output</th><th scope="col">Nearest neighbor</th><th scope="col">Bilinear</th></tr></thead><tbody>
+<tr><th scope="row">Railing · 100 × 100</th><td>1.68</td><td>4.02</td></tr>
+<tr><th scope="row">Sign · 200 × 36</th><td>0.80</td><td>1.95</td></tr>
+</tbody></table></div><p class="prose">In these small rectification runs, bilinear takes about twice as long. Both implementations process one output row at a time and use NumPy across its columns. The timings show the extra compute needed for the smoother result.</p></section>
+<section id="mosaics"><div class="section-heading"><span class="section-number">A.4 /</span><h2>Blend images into a mosaic</h2></div>
+
+<p class="prose">I keep the right image as the reference and warp the left image into its projection with bilinear interpolation. The shared canvas includes both the transformed left-image corners and the original right-image corners. I translate both images onto that canvas so negative coordinates do not cut off part of the warped view.</p>
+<p class="prose">Simply overwriting one photo with the other would create a hard seam. Instead, I build a validity mask for each image and use its distance to the nearest invalid pixel as a blending weight. I pad each mask with zeros before taking the distance transform, so its outer border is treated as a boundary too. The left mask is warped with nearest neighbor to keep it binary.</p>
+<div class="equation">w<sub>L</sub> = distance(mask<sub>L</sub>) &nbsp; · &nbsp; w<sub>R</sub> = distance(mask<sub>R</sub>) &nbsp; · &nbsp; mosaic = (w<sub>L</sub>I<sub>L</sub> + w<sub>R</sub>I<sub>R</sub>) / (w<sub>L</sub> + w<sub>R</sub>)</div>
+<p class="prose">Pixels farther from an image boundary contribute more. Where only one image is valid, that image supplies the result; where neither is valid, the output stays black. Using masks also helps with actual black pixels in a photo not being mistaken for missing image data.</p>
+<h3>Edge Building</h3><p class="caption"><a href="#sources-edge">View the two source images ↑</a></p>
+<figure class="mosaic"><a class="photo-link" href="assets/mosaic-edge.jpeg"><img src="assets/mosaic-edge.jpeg" alt="Building mosaic · bilinear warp and distance-weighted blending" width="1660" height="1604" loading="lazy" decoding="async" /></a><figcaption>Edge Building mosaic · bilinear warp and distance-weighted blending</figcaption></figure>
+
+<h3>Zellerbach</h3><p class="caption"><a href="#sources-zeller">View the two source images ↑</a></p>
+<figure class="mosaic"><a class="photo-link" href="assets/mosaic-zeller.jpeg"><img src="assets/mosaic-zeller.jpeg" alt="Zellerbach mosaic · bilinear warp and distance-weighted blending" width="1754" height="1585" loading="lazy" decoding="async" /></a><figcaption>Zellerbach mosaic · bilinear warp and distance-weighted blending</figcaption></figure>
+
+<h3>Laptop</h3><p class="caption"><a href="#sources-laptop">View the two source images ↑</a></p>
+<figure class="mosaic"><a class="photo-link" href="assets/mosaic-laptop.jpeg"><img src="assets/mosaic-laptop.jpeg" alt="Laptop mosaic · bilinear warp and distance-weighted blending" width="1886" height="1693" loading="lazy" decoding="async" /></a><figcaption>Laptop mosaic · bilinear warp and distance-weighted blending</figcaption></figure>
+
+</section>
+<section id="reflection"><div class="section-heading"><h2>What I learned</h2></div>
+<p class="prose">The main lesson is that alignment and blending solve different problems. A homography decides where the pixels belong; blending decides how much each image contributes. Good correspondences and suitable camera motion matter first. Once those are close, inverse warping and weighted averaging can turn the two views into a wider image, but smoother blending alone does not fix a bad match.</p>
+</section>
+<section class="references" id="references"><h3>Reference</h3><p><a href="https://cal-cs180.github.io/fa26/hw/proj3/partA.html">CS180 Project 4 Part A · Image Warping and Mosaicing</a></p></section>
+</main>
+<footer><a href="../index.html">← All CS180 projects</a><span>Carl Djapardi · Fall 2026</span></footer>
+</body>
+</html>
