@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="CS180 Project 4 Part A by Carl Djapardi: recovering homographies, inverse image warping, rectification, and manually stitched photo mosaics." />
+  <meta name="description" content="CS180 Project 4 by Carl Djapardi: manual and automatic photo mosaics using homographies, inverse warping, Harris corners, feature matching, and RANSAC." />
   <title>CS 180 Proj 4 · Image Warping and Mosaicing</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -11,21 +11,21 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header"><nav class="nav" aria-label="Project navigation">
   <a class="nav-brand" href="../index.html">← CS180 Portfolio</a>
-  <div class="nav-links"><a href="#pictures">Pictures</a><a href="#homographies">Homographies</a><a href="#warping">Warping</a><a href="#mosaics">Mosaics</a></div>
+  <div class="nav-links"><a href="#part-a">Part A</a><a href="#part-b">Part B</a><a href="#corners">Corners</a><a href="#descriptors">Descriptors</a><a href="#matching">Matching</a><a href="#ransac">RANSAC</a></div>
 </nav></header>
 <main id="main">
 <div class="intro"><div>
   <p class="eyebrow">CS180 · Project 04 · Fall 2026 · Carl Djapardi</p>
   <h1>Image Warping<br />and Mosaicing</h1>
-  <p class="hero-description">The goal of this project is to combine different views of the same scene into one image. I start by selecting matching points and recovering a homography, then use that transformation to straighten objects and blend overlapping photos into mosaics.</p>
+  <p class="hero-description">The goal of this project is to combine different views of the same scene into one image. I start by selecting matching points and recovering a homography, then use that transformation to straighten objects and blend overlapping photos into mosaics. In Part B, I replace the manual point selection with corner detection, feature matching, and RANSAC.</p>
 </div>
 <figure class=""><a class="photo-link" href="assets/mosaic-edge.jpeg"><img src="assets/mosaic-edge.jpeg" alt="Two views, one wider scene." width="1660" height="1604" loading="eager" decoding="async" /></a><figcaption>Two views, one wider scene.</figcaption></figure>
 </div>
-<p class="part-heading">Part A / Image warping and mosaicing</p>
+<p class="part-heading" id="part-a">Part A / Image warping and mosaicing</p>
 <section id="pictures"><div class="section-heading"><span class="section-number">A.1 /</span><h2>Shoot the pictures</h2></div>
 
-<p class="prose">Here are the three image pairs I use: 1. the building called edge across from a balcony, 2. Zellerbach hall, and 3. laptop on a table. Each pair has an overlapping region (about 50%) with recognizable corners and edges, which makes it possible to select the same points in both images.</p>
-<p class="prose">The idea is to rotate the camera around a fixed center of projection. Under pure rotation, a homography relates the two views. If the camera also translates, a single homography can still align a plane, but objects at other depths (focal lengths) may not line up.</p>
+<p class="prose">Here are the three image pairs I use: Edge Building viewed from a balcony, Zellerbach Hall, and a laptop on a table. Each pair has an overlapping region (about 50%) with recognizable corners and edges, which makes it possible to select the same points in both images.</p>
+<p class="prose">The idea is to rotate the camera around a fixed center of projection. Under pure rotation, a homography relates the two views. If the camera also translates, a single homography can still align a plane, but objects at other depths may not line up.</p>
 <h3 id="sources-edge">Edge Building</h3><div class="gallery two source-pair">
 <figure class=""><a class="photo-link" href="assets/edgeLeft.jpeg"><img src="assets/edgeLeft.jpeg" alt="Edge Building · left view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Edge Building · left view</figcaption></figure>
 <figure class=""><a class="photo-link" href="assets/edgeRight.jpeg"><img src="assets/edgeRight.jpeg" alt="Edge Building · right view" width="960" height="1280" loading="lazy" decoding="async" /></a><figcaption>Edge Building · right view</figcaption></figure>
@@ -41,7 +41,7 @@
 </section>
 <section id="homographies"><div class="section-heading"><span class="section-number">A.2 /</span><h2>Recover homographies</h2></div>
 
-<p class="prose">A homography is a 3 × 3 matrix that maps points from one image to another in homogeneous coordinates (8 DOF). It can account for perspective changes, so parallel lines do not have to stay parallel. What remains the same after transformation is straight lines (colinear lines). Since multiplying the whole matrix by a nonzero scalar gives the same mapping, I set its bottom-right entry to 1 and solve for the remaining eight values.</p>
+<p class="prose">A homography is a 3 × 3 matrix that maps points from one image to another in homogeneous coordinates (8 DOF). It can account for perspective changes, so parallel lines do not have to stay parallel. Straight lines remain straight after the transformation. Since multiplying the whole matrix by a nonzero scalar gives the same mapping, I set its bottom-right entry to 1 and solve for the remaining eight values.</p>
 <div class="equation">[u, v, w]<sup>T</sup> = H[x, y, 1]<sup>T</sup> &nbsp; · &nbsp; x′ = u / w &nbsp; · &nbsp; y′ = v / w</div>
 <p class="prose">For each match (x, y) → (x′, y′), multiplying through by the denominator gives two linear equations. Stacking these rows for all correspondences forms Ah = b, where h contains the first eight entries of H in row order.</p>
 <pre aria-label="Two rows of the homography linear system"><code>[ x  y  1  0  0  0  −xx′  −yx′ ] h = x′
@@ -70,7 +70,7 @@
 <h3>Nearest neighbor vs. bilinear interpolation</h3>
 <p class="prose">The inverse-mapped location usually falls between pixels. My nearest-neighbor implementation rounds it to the closest pixel and copies that value. My bilinear implementation uses the four surrounding pixels, weighted by the fractional horizontal and vertical distances.</p>
 <div class="equation">Im(x, y) = (1−a)(1−b)Im<sub>00</sub> + a(1−b)Im<sub>10</sub> + (1−a)bIm<sub>01</sub> + abIm<sub>11</sub></div>
-<p class="prose">Here a = x − floor(x) and b = y − floor(y). Nearest neighbor has less operations but can create jagged edges and aliasing. Bilinear needs four samples and more arithmetic, but produces smoother transitions. It can also soften fine details.</p>
+<p class="prose">Here a = x − floor(x) and b = y − floor(y). Nearest neighbor uses fewer operations but can create jagged edges and aliasing. Bilinear needs four samples and more arithmetic, but produces smoother transitions. It can also soften fine details.</p>
 <h3>Rectification / Edge Building balcony railing</h3>
 <p class="prose">For rectification, I match four corners of a surface in the original photo to a rectangle that I define by hand. For the railing, the source points are (41, 524), (148, 601), (6, 631), and (124, 700) in the left building photo. I map them to (0, 0), (100, 0), (0, 100), and (100, 100), then sample a 100 × 100 output.</p>
 <div class="gallery rectification">
@@ -80,7 +80,7 @@
 
 </div><p class="prose">The slanted railing becomes upright in both results. The repeated thin bars make the interpolation difference easy to see: nearest neighbor creates rough, uneven edges, while bilinear smooths them.</p>
 <h3>Rectification / Zellerbach Cal Performances sign</h3>
-<p class="prose">For the sign, I use points (249, 1174), (459, 1156), (245, 1209), and (460, 1187) in the right Zellerbach photo. The destination points are (0, 0), (200, 0), (0, 35), and (200, 35), with an output shape of 35 × 200.</p>
+<p class="prose">For the sign, I use points (249, 1174), (459, 1156), (245, 1209), and (460, 1187) in the right Zellerbach photo. The destination points are (0, 0), (200, 0), (0, 35), and (200, 35), with an output shape of 36 × 200.</p>
 <div class="gallery rectification">
 <figure class=""><a class="photo-link" href="assets/zeller_rect_og.jpeg"><img src="assets/zeller_rect_og.jpeg" alt="Original crop · Cal Performances sign" width="1016" height="284" loading="lazy" decoding="async" /></a><figcaption>Original crop · Cal Performances sign</figcaption></figure>
 <figure class=""><a class="photo-link" href="assets/zeller_rec_nn.jpeg"><img src="assets/zeller_rec_nn.jpeg" alt="Rectified · nearest neighbor" width="200" height="36" loading="lazy" decoding="async" /></a><figcaption>Rectified · nearest neighbor</figcaption></figure>
@@ -90,7 +90,8 @@
 <div class="table-wrap"><table><caption>Rectification runtime in milliseconds · median of 5 local runs</caption><thead><tr><th scope="col">Output</th><th scope="col">Nearest neighbor</th><th scope="col">Bilinear</th></tr></thead><tbody>
 <tr><th scope="row">Railing · 100 × 100</th><td>1.68</td><td>4.02</td></tr>
 <tr><th scope="row">Sign · 200 × 36</th><td>0.80</td><td>1.95</td></tr>
-</tbody></table></div><p class="prose">In these small rectification runs, bilinear takes about twice as long. Both implementations process one output row at a time and use NumPy across its columns. The timings show the extra compute needed for the smoother result.</p></section>
+</tbody></table></div><p class="prose">In these small rectification runs, bilinear takes about twice as long. Both implementations process one output row at a time and use NumPy across its columns. The timings show the extra compute needed for the smoother result.</p>
+</section>
 <section id="mosaics"><div class="section-heading"><span class="section-number">A.4 /</span><h2>Blend images into a mosaic</h2></div>
 
 <p class="prose">I keep the right image as the reference and warp the left image into its projection with bilinear interpolation. The shared canvas includes both the transformed left-image corners and the original right-image corners. I translate both images onto that canvas so negative coordinates do not cut off part of the warped view.</p>
@@ -107,10 +108,71 @@
 <figure class="mosaic"><a class="photo-link" href="assets/mosaic-laptop.jpeg"><img src="assets/mosaic-laptop.jpeg" alt="Laptop mosaic · bilinear warp and distance-weighted blending" width="1886" height="1693" loading="lazy" decoding="async" /></a><figcaption>Laptop mosaic · bilinear warp and distance-weighted blending</figcaption></figure>
 
 </section>
-<section id="reflection"><div class="section-heading"><h2>What I learned</h2></div>
-<p class="prose">The main lesson is that alignment and blending solve different problems. A homography decides where the pixels belong; blending decides how much each image contributes. Good correspondences and suitable camera motion matter first. Once those are close, inverse warping and weighted averaging can turn the two views into a wider image, but smoother blending alone does not fix a bad match.</p>
+<p class="part-heading" id="part-b">Part B / Feature matching for autostitching</p>
+<p class="prose part-intro">In Part A, I choose the matching points by hand. Here, the goal is to find those correspondences automatically. I use the same three image pairs, detect corners, describe their neighborhoods, and match them across the two views. RANSAC then removes inconsistent matches before the images are warped and blended.</p>
+<section id="corners"><div class="section-heading"><span class="section-number">B.1 /</span><h2>Harris corner detection</h2></div>
+<p class="prose">A corner has strong intensity changes in both image directions. Harris measures this using a structure matrix M, formed by averaging products of the horizontal and vertical image gradients over a Gaussian-weighted neighborhood.</p>
+<div class="equation">M = G * [[I<sub>x</sub>², I<sub>x</sub>I<sub>y</sub>], [I<sub>x</sub>I<sub>y</sub>, I<sub>y</sub>²]] &nbsp; · &nbsp; R ≈ 2 det(M) / trace(M)</div>
+<p class="prose">Here I<sub>x</sub> and I<sub>y</sub> are image gradients, and G is a Gaussian filter. The supplied detector uses this normalized Harris response. Its score is large when both eigenvalues of M are large: intensity changes strongly in two directions. An edge has one small eigenvalue, while a flat region has two small ones, so both receive lower scores.</p>
+<p class="prose">Keeping only the 500 highest-scoring corners clusters many points around the railings and textured building details. Adaptive Non-Maximal Suppression (ANMS) instead considers how far each corner is from a sufficiently stronger corner. I keep the 500 points with the largest distances, giving a more spread-out set.</p>
+<div class="equation">r<sub>i</sub> = min ‖p<sub>i</sub> − p<sub>j</sub>‖ &nbsp; over j such that &nbsp; f<sub>i</sub> &lt; 0.9 f<sub>j</sub></div>
+<p class="prose">Here f is the Harris response and r is the suppression radius. A large radius means there is no substantially stronger corner nearby.</p>
+<div class="gallery three corner-comparison">
+<figure><a class="photo-link" href="assets/partb/b1-edge-left-harris.png"><img src="assets/partb/b1-edge-left-harris.png" alt="Edge Building · all detected Harris corners" width="723" height="954" loading="lazy" decoding="async" /></a><figcaption>All detected Harris corners</figcaption></figure>
+<figure class="top-corners"><a class="photo-link" href="assets/partb/b1-corners_top500.jpeg"><img src="assets/partb/b1-corners_top500.jpeg" alt="Edge Building · 500 corners with the highest Harris responses" width="1920" height="1440" loading="lazy" decoding="async" /></a><figcaption>Top 500 · ranked by Harris response</figcaption></figure>
+<figure><a class="photo-link" href="assets/partb/b1-edge-left-anms.png"><img src="assets/partb/b1-edge-left-anms.png" alt="Edge Building · 500 corners selected with ANMS" width="723" height="954" loading="lazy" decoding="async" /></a><figcaption>500 corners · selected with ANMS</figcaption></figure>
+</div>
+<p class="prose">The top-500 result favors strong details but leaves much of the sky empty. ANMS distributes points more broadly, including weaker points in the sky. Those points are not necessarily useful matches; the next steps compare their appearance and check their geometric consistency.</p>
 </section>
-<section class="references" id="references"><h3>Reference</h3><p><a href="https://cal-cs180.github.io/fa26/hw/proj3/partA.html">CS180 Project 4 Part A · Image Warping and Mosaicing</a></p></section>
+<section id="descriptors"><div class="section-heading"><span class="section-number">B.2 /</span><h2>Feature descriptor extraction</h2></div>
+<p class="prose">A corner location alone does not tell us which point in the other image it corresponds to. To describe its appearance, I blur the grayscale image with a Gaussian of σ = 2, take a 40 × 40 window around each selected corner, and sample every fifth pixel. This gives an 8 × 8 patch, which I flatten into a 64-value descriptor.</p>
+<p class="prose">I normalize each patch to zero mean and unit standard deviation so matching depends more on its pattern than its brightness or contrast. The patches are axis-aligned, so they do not account for rotation or scale changes.</p>
+<div class="equation">descriptor = flatten((patch − mean(patch)) / std(patch)) &nbsp; · &nbsp; 40 × 40 → 8 × 8 → 64</div>
+<div class="gallery two descriptor-pair"><figure class=""><a class="photo-link" href="assets/partb/b2-edge-left-descriptors.png"><img src="assets/partb/b2-edge-left-descriptors.png" alt="Edge Building · 16 descriptors from the left image" width="900" height="900" loading="lazy" decoding="async" /></a><figcaption>Edge Building · 16 descriptors from the left image</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/partb/b2-edge-right-descriptors.png"><img src="assets/partb/b2-edge-right-descriptors.png" alt="Edge Building · 16 descriptors from the right image" width="900" height="900" loading="lazy" decoding="async" /></a><figcaption>Edge Building · 16 descriptors from the right image</figcaption></figure>
+</div>
+<p class="prose">The patches preserve broad patterns such as dark window edges against a lighter wall. Each grid shows 16 examples from one image; tiles in the same position across the two grids are not matched pairs.</p>
+<details><summary>Descriptor examples · Zellerbach and laptop</summary>
+<h3>Zellerbach</h3><div class="gallery two descriptor-pair"><figure class=""><a class="photo-link" href="assets/partb/b2-zeller-left-descriptors.png"><img src="assets/partb/b2-zeller-left-descriptors.png" alt="Zellerbach · 16 left-image descriptors" width="900" height="900" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · 16 left-image descriptors</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/partb/b2-zeller-right-descriptors.png"><img src="assets/partb/b2-zeller-right-descriptors.png" alt="Zellerbach · 16 right-image descriptors" width="900" height="900" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · 16 right-image descriptors</figcaption></figure>
+</div><h3>Laptop</h3><div class="gallery two descriptor-pair"><figure class=""><a class="photo-link" href="assets/partb/b2-laptop-left-descriptors.png"><img src="assets/partb/b2-laptop-left-descriptors.png" alt="Laptop · 16 left-image descriptors" width="900" height="900" loading="lazy" decoding="async" /></a><figcaption>Laptop · 16 left-image descriptors</figcaption></figure>
+<figure class=""><a class="photo-link" href="assets/partb/b2-laptop-right-descriptors.png"><img src="assets/partb/b2-laptop-right-descriptors.png" alt="Laptop · 16 right-image descriptors" width="900" height="900" loading="lazy" decoding="async" /></a><figcaption>Laptop · 16 right-image descriptors</figcaption></figure>
+</div></details>
+</section>
+<section id="matching"><div class="section-heading"><span class="section-number">B.3 /</span><h2>Feature matching</h2></div>
+<p class="prose">For every descriptor in the left image, I compute its Euclidean distance to all descriptors in the right image. Choosing the nearest one alone is risky: repeated windows or keys can look almost the same. I compare the nearest and second-nearest distances and accept the match only when their ratio is below 0.8.</p>
+<div class="equation">d<sub>1</sub> / d<sub>2</sub> &lt; 0.8 &nbsp; · &nbsp; d<sub>1</sub> = nearest descriptor distance &nbsp; · &nbsp; d<sub>2</sub> = second-nearest distance</div>
+<p class="prose">A small ratio means the best candidate is more distinctive than the next choice. If several points choose the same destination, I keep the match with the lowest ratio. The lines below show the accepted matches before RANSAC.</p>
+<figure class="correspondences"><a class="photo-link" href="assets/partb/b3-edge-matches.png"><img src="assets/partb/b3-edge-matches.png" alt="Edge Building · 71 descriptor matches before RANSAC" width="1416" height="954" loading="lazy" decoding="async" /></a><figcaption>Edge Building · 71 descriptor matches before RANSAC</figcaption></figure>
+<figure class="correspondences"><a class="photo-link" href="assets/partb/b3-zeller-matches.png"><img src="assets/partb/b3-zeller-matches.png" alt="Zellerbach · 42 descriptor matches before RANSAC" width="1416" height="954" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · 42 descriptor matches before RANSAC</figcaption></figure>
+<figure class="correspondences"><a class="photo-link" href="assets/partb/b3-laptop-matches.png"><img src="assets/partb/b3-laptop-matches.png" alt="Laptop · 87 descriptor matches before RANSAC" width="1416" height="954" loading="lazy" decoding="async" /></a><figcaption>Laptop · 87 descriptor matches before RANSAC</figcaption></figure>
+<p class="prose">Many lines connect the same structures, but some jump between unrelated locations, especially in the sky or repeated texture. Similar-looking patches can still be incorrect matches, so I use RANSAC to check whether they agree with one homography.</p>
+</section>
+<section id="ransac"><div class="section-heading"><span class="section-number">B.4 /</span><h2>RANSAC for robust homography</h2></div>
+<p class="prose">RANSAC (Random Sample Consensus) looks for a homography supported by many matches despite the outliers. In each of 5,000 iterations, I randomly sample four point pairs, solve for H using the same least-squares formulation as Part A, and project every source point into the right image. A match is an inlier if the projected point lands within 3 pixels of its match.</p>
+<div class="equation">error<sub>i</sub> = ‖project(Hp<sub>i</sub>) − p′<sub>i</sub>‖ &nbsp; · &nbsp; inlier if error<sub>i</sub> &lt; 3 pixels</div>
+<p class="prose">I keep the homography with the most inliers, then refit H using that set of matches. This gives the final estimate support from many consistent points rather than just the four in one random sample.</p>
+<h3>Automatic mosaics vs. manual mosaics</h3>
+<p class="prose">I use the same inverse bilinear warping and distance-weighted blending as Part A, with the right image as the reference. Each comparison uses the original hand-selected points on the left and automatic matches with RANSAC on the right.</p>
+<h3 id="automatic-edge">Edge Building</h3><p class="caption"><a href="#sources-edge">View the source images ↑</a> &nbsp; · &nbsp; <a href="assets/partb/b4-edge-automatic.jpeg">Full-size automatic mosaic</a></p><details><summary>Edge Building · inspect the 46 RANSAC inliers</summary>
+<figure class="correspondences"><a class="photo-link" href="assets/partb/b4-edge-inliers.png"><img src="assets/partb/b4-edge-inliers.png" alt="Edge Building · 46 final RANSAC inliers" width="1416" height="954" loading="lazy" decoding="async" /></a><figcaption>Edge Building · 46 final RANSAC inliers</figcaption></figure>
+</details>
+<figure class="mosaic-comparison"><a class="photo-link" href="assets/partb/b4-edge-comparison.png"><img src="assets/partb/b4-edge-comparison.png" alt="Edge Building · manual stitching on the left; automatic stitching + RANSAC on the right" width="2100" height="1050" loading="lazy" decoding="async" /></a><figcaption>Edge Building · manual stitching on the left; automatic stitching + RANSAC on the right</figcaption></figure>
+<p class="prose">The automatic mosaic keeps the central building continuous and is visually similar to the manual result. The outer boundary changes slightly because the estimated homography is different. The inlier lines mostly connect building details rather than the scattered sky matches seen before RANSAC.</p>
+<h3 id="automatic-zeller">Zellerbach</h3><p class="caption"><a href="#sources-zeller">View the source images ↑</a> &nbsp; · &nbsp; <a href="assets/partb/b4-zeller-automatic.jpeg">Full-size automatic mosaic</a></p><details><summary>Zellerbach · inspect the 30 RANSAC inliers</summary>
+<figure class="correspondences"><a class="photo-link" href="assets/partb/b4-zeller-inliers.png"><img src="assets/partb/b4-zeller-inliers.png" alt="Zellerbach · 30 final RANSAC inliers" width="1416" height="954" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · 30 final RANSAC inliers</figcaption></figure>
+</details>
+<figure class="mosaic-comparison"><a class="photo-link" href="assets/partb/b4-zeller-comparison.png"><img src="assets/partb/b4-zeller-comparison.png" alt="Zellerbach · manual stitching on the left; automatic stitching + RANSAC on the right" width="2100" height="1050" loading="lazy" decoding="async" /></a><figcaption>Zellerbach · manual stitching on the left; automatic stitching + RANSAC on the right</figcaption></figure>
+<p class="prose">The facade and Cal Performances sign remain continuous in the automatic result. Its overall framing differs slightly from the manual mosaic, but both produce a recognizable wider view. Some softness remains around fine details, so the alignment is still not perfect.</p>
+<h3 id="automatic-laptop">Laptop</h3><p class="caption"><a href="#sources-laptop">View the source images ↑</a> &nbsp; · &nbsp; <a href="assets/partb/b4-laptop-automatic.jpeg">Full-size automatic mosaic</a></p><details><summary>Laptop · inspect the 56 RANSAC inliers</summary>
+<figure class="correspondences"><a class="photo-link" href="assets/partb/b4-laptop-inliers.png"><img src="assets/partb/b4-laptop-inliers.png" alt="Laptop · 56 final RANSAC inliers" width="1416" height="954" loading="lazy" decoding="async" /></a><figcaption>Laptop · 56 final RANSAC inliers</figcaption></figure>
+</details>
+<figure class="mosaic-comparison"><a class="photo-link" href="assets/partb/b4-laptop-comparison.png"><img src="assets/partb/b4-laptop-comparison.png" alt="Laptop · manual stitching on the left; automatic stitching + RANSAC on the right" width="2100" height="1050" loading="lazy" decoding="async" /></a><figcaption>Laptop · manual stitching on the left; automatic stitching + RANSAC on the right</figcaption></figure>
+<p class="prose">Most accepted matches lie on the screen, and the automatic mosaic aligns that region well. However, the keyboard has visibly doubled keys and is less clean than the manual result. A homography that fits the screen cannot also correct parallax on a differently oriented keyboard when the camera translates.</p>
+</section>
+</section>
+<section class="references" id="references"><h3>References</h3><p><a href="https://cal-cs180.github.io/fa26/hw/proj3/partA.html">Part A · Image Warping and Mosaicing</a> &nbsp; · &nbsp; <a href="https://cal-cs180.github.io/fa26/hw/proj3/partB.html">Part B · Feature Matching for Autostitching</a></p>
+</section>
 </main>
 <footer><a href="../index.html">← All CS180 projects</a><span>Carl Djapardi · Fall 2026</span></footer>
 </body>
